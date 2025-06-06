@@ -1,1 +1,2 @@
 # phpuploader
+windowsサーバー間のデータバックアップツールです。
