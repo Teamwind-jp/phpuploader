@@ -79,7 +79,7 @@
     End Sub
 
     Sub addDays(days As Integer)
-        dt.AddDays(days)
+        dt = dt.AddDays(days)
     End Sub
 
 
