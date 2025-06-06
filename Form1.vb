@@ -400,7 +400,7 @@ Public Class Form1
 
             '次回処理日をセット
             '完了後　本日指定時刻が過ぎてなければ指定時刻に再実行するので日付移動はしない
-            dtbk = dt
+            dtbk = dt.Clone
             If dt.hour < h Then
                 '今日もう一回
             Else

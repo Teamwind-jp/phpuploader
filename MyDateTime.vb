@@ -1,11 +1,18 @@
 ﻿Public Class MyDateTime
 
+    Implements ICloneable
+
+
     Private dt As DateTime
     Private finit As Boolean = False
 
     Public Sub New()
         finit = False
     End Sub
+
+    Public Function Clone() As Object Implements ICloneable.Clone
+        Return MemberwiseClone()
+    End Function
 
     Sub clear()
         finit = False
@@ -74,7 +81,6 @@
     Sub addDays(days As Integer)
         dt.AddDays(days)
     End Sub
-
 
 
 End Class
