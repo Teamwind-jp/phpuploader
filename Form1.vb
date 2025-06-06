@@ -425,7 +425,7 @@ Public Class Form1
 
         'ここまできたら開始
         '次回処理日をセット
-        dtbk = dt
+        dtbk = dt.Clone
         dtbk.addDays(1)
         dtbk.setHour(h)
         dtbk.setMinute(0)
