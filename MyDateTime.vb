@@ -81,6 +81,9 @@
     Sub addDays(days As Integer)
         dt = dt.AddDays(days)
     End Sub
+    Function toFormatString(Optional fmt As String = "yyyy/MM/dd HH:mm:ss") As String
+        Return dt.ToString(fmt)
+    End Function
 
 
 End Class

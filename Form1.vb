@@ -227,6 +227,13 @@ Public Class Form1
 
             Next
 
+            'log out
+            cmn_textOut(My.Application.Info.DirectoryPath + "\log.txt", "done")
+            'msg
+            Dim dt As New MyDateTime
+            dt.init()
+            Me.Invoke(my_dlg_l4, New Object() {dt.toFormatString + " done"})
+
             'Erase go Wait for next timing. go消す 次のタイミング待ち状態にする
             Me.Invoke(my_dlg_setGo, New Object() {False})
             'Return the button. ボタンも戻す
