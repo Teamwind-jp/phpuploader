@@ -1,4 +1,6 @@
-﻿Imports System.Security.Policy
+﻿'   (c)Teamwind japan h.hayashi
+
+Imports System.Security.Policy
 
 Module ini
 
@@ -16,7 +18,7 @@ Module ini
 #Region "ini io"
 
     '============================================================
-    '   読み込む 
+    '   read
     '============================================================
     Public Function ini_read() As Boolean
 
@@ -30,7 +32,7 @@ Module ini
 
             Do While StreamReader.Peek() >= 0
 
-                '一行読込
+                'Read one line. 一行読込
                 sztemp = StreamReader.ReadLine()
 
                 'up url
@@ -65,7 +67,7 @@ Module ini
     End Function
 
     '============================================================
-    '   ファイルに書き込む 
+    '   Write to a file. ファイルに書き込む 
     '============================================================
     Public Function ini_write() As Boolean
 
@@ -76,15 +78,14 @@ Module ini
 
         ini_write = False
 
-        'EXEのパスを取得
+        'file name
         szpath = My.Application.Info.DirectoryPath + "\prof.ini"
 
-        'ファイルを開く
+        'open. ファイルを開く
         errcode = 0
         On Error GoTo err_open
         FileOpen(1, szpath, OpenMode.Output)
         If errcode <> 0 Then
-            'なにもしない
             Exit Function
         End If
 

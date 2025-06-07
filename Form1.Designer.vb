@@ -167,9 +167,9 @@ Partial Class Form1
         Me.Label3.AutoSize = True
         Me.Label3.Location = New System.Drawing.Point(41, 88)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(145, 12)
+        Me.Label3.Size = New System.Drawing.Size(104, 12)
         Me.Label3.TabIndex = 25
-        Me.Label3.Text = "backup folder ドラッグドロップ"
+        Me.Label3.Text = "drag backup folder "
         '
         'Label2
         '
@@ -196,9 +196,9 @@ Partial Class Form1
         Me.Label1.AutoSize = True
         Me.Label1.Location = New System.Drawing.Point(41, 28)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(252, 12)
+        Me.Label1.Size = New System.Drawing.Size(215, 12)
         Me.Label1.TabIndex = 22
-        Me.Label1.Text = "upload url phpまで「http://hoge.com/receive.php」"
+        Me.Label1.Text = "upload url 「http://hoge.com/receive.php」"
         '
         'txtUrl
         '
@@ -217,7 +217,7 @@ Partial Class Form1
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(268, 31)
         Me.Button1.TabIndex = 20
-        Me.Button1.Text = "開始"
+        Me.Button1.Text = "start"
         Me.Button1.UseVisualStyleBackColor = True
         '
         'Timer1
@@ -252,7 +252,7 @@ Partial Class Form1
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "Form1"
-        Me.Text = "php連動アップロード"
+        Me.Text = "zip uploader  (c)Teamwind jp "
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
