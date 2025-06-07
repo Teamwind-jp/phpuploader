@@ -47,31 +47,31 @@ If you have any requests, please email us.
 
 This is a sample php. 以下サンプルphpです。  
 
-:------------------------------------------
-:
-:	//sample php for phpuploader. phpuploader用receivesample php
-:	//Split file reception and merging process. 分割ファイル受信結合処理
-:
-:	//this store them by day of the week, meaning keep a 7-day supply.
-:	//曜日ごとに保管しています。つまり7日分保持しています。
-:
-:	//Please change each setting as appropriate.
-:	//各設定は、適宜変更してください。
-:
-:	//MIT license (c)teamwind n.h
-:
-:	//(Translation by Google)
-:
-:	//Storage directory. 保管dir
-:	//for windows
-:	$storagedir = "c:\\backup\\";
-:
-:	//?
-:	if($_FILES["file"]["tmp_name"]==""){
-:		throw new \Exception($dir.$zipname."?no file");
-:		exit;
-:	}
-:
+:------------------------------------------  
+:  
+:	//sample php for phpuploader. phpuploader用receivesample php  
+:	//Split file reception and merging process. 分割ファイル受信結合処理  
+:  
+:	//this store them by day of the week, meaning keep a 7-day supply.  
+:	//曜日ごとに保管しています。つまり7日分保持しています。  
+:  
+:	//Please change each setting as appropriate.  
+:	//各設定は、適宜変更してください。  
+:  
+:	//MIT license (c)teamwind n.h  
+:  
+:	//(Translation by Google)  
+:  
+:	//Storage directory. 保管dir  
+:	//for windows  
+:	$storagedir = "c:\\backup\\";  
+:  
+:	//?  
+:	if($_FILES["file"]["tmp_name"]==""){  
+:		throw new \Exception($dir.$zipname."?no file");  
+:		exit;  
+:	}  
+:  
 :	//Sub-dir name of storage dir. 保管dirの下位dir名
 :	$week = array('sun','mon','tue','wed','thu','fri','sat');
 :
