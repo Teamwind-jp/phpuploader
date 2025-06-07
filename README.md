@@ -47,129 +47,129 @@ If you have any requests, please email us.
 
 This is a sample php. 以下サンプルphpです。  
 
-   1:<?
-   2:    //sample php for phpuploader. phpuploader用receivesample php
-   3:    //Split file reception and merging process. 分割ファイル受信結合処理
-   4:
-   5:    //this store them by day of the week, meaning keep a 7-day supply.
-   6:    //曜日ごとに保管しています。つまり7日分保持しています。
-   7:
-   8:    //Please change each setting as appropriate.
-   9:    //各設定は、適宜変更してください。
-  10:
-  11:    //MIT license (c)teamwind n.h
-  12:
-  13:    //(Translation by Google)
-  14:
-  15:    //Storage directory. 保管dir
-  16:    //for windows
-  17:    $storagedir = "c:\\backup\\";
-  18:
-  19:    //?
-  20:    if($_FILES["file"]["tmp_name"]==""){
-  21:        throw new \Exception($dir.$zipname."?no file");
-  22:        exit;
-  23:    }
-  24:
-  25:    //Sub-dir name of storage dir. 保管dirの下位dir名
-  26:    $week = array('sun','mon','tue','wed','thu','fri','sat');
-  27:
-  28:    $date = date('w');
-  29:
-  30:    //prm analysis. prm解析
-  31:    $prms = explode(',', mb_convert_encoding($_GET["prm"], "SJIS", "UTF-8"));
-  32:
-  33:    //prm=zip File name+Division Number(000-nnn),Division Number(000-nnn),Final division number,this md5,zip md5
-  34:    //prm=zipファイル名+分割番号,分割番号,最終分割番号,当該md5,結合したzipのmd5
-  35:    //abc.zip.000,2,xxxxxxxxxxxxxxxxxxxx(md5),xxxxxxxxxxxxxxxxxxxx(md5)
-  36:    //abc.zip.001,2,xxxxxxxxxxxxxxxxxxxx(md5),xxxxxxxxxxxxxxxxxxxx(md5)
-  37:    //abc.zip.002,2,xxxxxxxxxxxxxxxxxxxx(md5),xxxxxxxxxxxxxxxxxxxx(md5)
-  38:    $_sepname = $prms[0];
-  39:    $_no = (int)$prms[1];
-  40:    $_lastno = (int)$prms[2];
-  41:    $_md5 = $prms[3];
-  42:    $_zipmd5 = $prms[4];
-  43:
-  44:    //Create a storage directory. 保管dirの生成
-  45:    $dir = $storagedir."\\".$week[$date]."\\";
-  46:    if(file_exists($dir)){
-  47:    }else{
-  48:        mkdir($dir, 0777, true);
-  49:    }
-  50:    //move file. 移動
-  51:    move_uploaded_file($_FILES["file"]["tmp_name"], $dir.$_sepname);
-  52:
-  53:    //md5 check. md5チェック
-  54:    $md5 = md5_file($dir.$_sepname);
-  55:    if($_md5 === $md5){
-  56:    } else {
-  57:        throw new \Exception($dir.$_sepname."md5 error");
-  58:    }
-  59:
-  60:    //If it is the last file, start joining. もし最終ファイルなら結合開始
-  61:    if($_no == $_lastno){
-  62:
-  63:        //Zip file name without [.nnn]. zip file名は[.nnn]を除いたもの   abc.zip.000
-  64:        $zipname = substr($_sepname, 0, strlen($_sepname)-4);
-  65:
-  66:        //Generate a file list. ファイルリストを生成する
-  67:        //abc.zip.000
-  68:        //abc.zip.001
-  69:        //abc.zip.002
-  70:        for($i = 0; $i <= $_lastno; $i++){
-  71:            $files[$i] = $dir.$zipname.".".sprintf("%03d", $i);
-  72:        }
-  73:
-  74:        //Combine these. これらを結合
-  75:        if($_lastno == 0){
-  76:            //If it's single, it's just a copy. 単一ならただのコピー
-  77:            copy($dir.$_sepname, $dir.$zipname);
-  78:            unlink($dir.$_sepname);
-  79:        } else {
-  80:            //Destination file name. 出力先のファイル名
-  81:            $outputFile = $dir.$zipname;
-  82:
-  83:            //Open the output file. 出力ファイルを開く
-  84:            $outputHandle = fopen($dir.$zipname, 'wb');
-  85:            if(!$outputHandle){
-  86:                //NG
-  87:            } else {
-  88:                //join. 結合
-  89:                //Read each file in turn and combine them.  各ファイルを順番に読み込んで結合
-  90:                foreach ($files as $file) {
-  91:                    if (!file_exists($file)) {
-  92:                        continue;
-  93:                    }
-  94:                    $inputHandle = fopen($file, 'rb');
-  95:                    if (!$inputHandle) {
-  96:                        continue;
-  97:                    }
-  98:                    //Read the file contents and write them to the output file.  ファイル内容を読み込んで出力ファイルに書き込む
-  99:                    while(!feof($inputHandle)) {
- 100:                        //64kbyte
- 101:                        $buffer = fread($inputHandle, 65536);
- 102:                        fwrite($outputHandle, $buffer);
- 103:                    }
- 104:                    fclose($inputHandle);
- 105:                    //Erase the original. 元を消す
- 106:                    unlink($file);
- 107:                }
- 108:                //Close the output file.  出力ファイルを閉じる
- 109:                fclose($outputHandle);
- 110:                //md5 check. md5チェック
- 111:                $md5 = md5_file($dir.$zipname);
- 112:                if($_zipmd5 === $md5){
- 113:                } else {
- 114:                    throw new \Exception($dir.$zipname."md5 error);
- 115:                }
- 116:            }
- 117:        }
- 118:    }
- 119:?>
- 120:
- 121:<form action="./receive.php" method="POST" enctype="multipart/form-data"> 
- 122:  <input type="file" name="file"> 
- 123:  <input type="submit" value="phpuploader sample php"> 
- 124:</form> 
+;<?  
+;    //sample php for phpuploader. phpuploader用receivesample php  
+;    //Split file reception and merging process. 分割ファイル受信結合処理  
+;  
+;    //this store them by day of the week, meaning keep a 7-day supply.  
+;    //曜日ごとに保管しています。つまり7日分保持しています。  
+;  
+;    //Please change each setting as appropriate.  
+;    //各設定は、適宜変更してください。  
+;  
+;    //MIT license (c)teamwind n.h  
+;  
+;    //(Translation by Google)  
+;  
+;    //Storage directory. 保管dir  
+;    //for windows  
+;    $storagedir = "c:\\backup\\";  
+;  
+;    //?  
+;    if($_FILES["file"]["tmp_name"]==""){  
+;        throw new \Exception($dir.$zipname."?no file");  
+;        exit;  
+;    }  
+;  
+;    //Sub-dir name of storage dir. 保管dirの下位dir名  
+;    $week = array('sun','mon','tue','wed','thu','fri','sat');  
+;  
+;    $date = date('w');  
+;  
+;    //prm analysis. prm解析  
+;    $prms = explode(',', mb_convert_encoding($_GET["prm"], "SJIS", "UTF-8"));  
+;  
+;    //prm=zip File name+Division Number(000-nnn),Division Number(000-nnn),Final division number,this md5,zip md5  
+;    //prm=zipファイル名+分割番号,分割番号,最終分割番号,当該md5,結合したzipのmd5  
+;    //abc.zip.000,2,xxxxxxxxxxxxxxxxxxxx(md5),xxxxxxxxxxxxxxxxxxxx(md5)  
+;    //abc.zip.001,2,xxxxxxxxxxxxxxxxxxxx(md5),xxxxxxxxxxxxxxxxxxxx(md5)  
+;    //abc.zip.002,2,xxxxxxxxxxxxxxxxxxxx(md5),xxxxxxxxxxxxxxxxxxxx(md5)  
+;    $_sepname = $prms[0];  
+;    $_no = (int)$prms[1];  
+;    $_lastno = (int)$prms[2];  
+;    $_md5 = $prms[3];  
+;    $_zipmd5 = $prms[4];  
+;  
+;    //Create a storage directory. 保管dirの生成  
+;    $dir = $storagedir."\\".$week[$date]."\\";  
+;    if(file_exists($dir)){  
+;    }else{  
+;        mkdir($dir, 0777, true);  
+;    }  
+;    //move file. 移動  
+;    move_uploaded_file($_FILES["file"]["tmp_name"], $dir.$_sepname);  
+;  
+;    //md5 check. md5チェック  
+;    $md5 = md5_file($dir.$_sepname);  
+;    if($_md5 === $md5){  
+;    } else {  
+;        throw new \Exception($dir.$_sepname."md5 error");  
+;    }  
+;  
+;    //If it is the last file, start joining. もし最終ファイルなら結合開始  
+;    if($_no == $_lastno){  
+;  
+;        //Zip file name without [.nnn]. zip file名は[.nnn]を除いたもの   abc.zip.000  
+;        $zipname = substr($_sepname, 0, strlen($_sepname)-4);  
+;  
+;        //Generate a file list. ファイルリストを生成する  
+;        //abc.zip.000  
+;        //abc.zip.001  
+;        //abc.zip.002  
+;        for($i = 0; $i <= $_lastno; $i++){  
+;            $files[$i] = $dir.$zipname.".".sprintf("%03d", $i);  
+;        }  
+;  
+;        //Combine these. これらを結合  
+;        if($_lastno == 0){  
+;            //If it's single, it's just a copy. 単一ならただのコピー  
+;            copy($dir.$_sepname, $dir.$zipname);  
+;            unlink($dir.$_sepname);  
+;        } else {  
+;            //Destination file name. 出力先のファイル名  
+;            $outputFile = $dir.$zipname;  
+;  
+;            //Open the output file. 出力ファイルを開く  
+;            $outputHandle = fopen($dir.$zipname, 'wb');  
+;            if(!$outputHandle){  
+;                //NG  
+;            } else {  
+;                //join. 結合  
+;                //Read each file in turn and combine them.  各ファイルを順番に読み込んで結合  
+;                foreach ($files as $file) {  
+;                    if (!file_exists($file)) {  
+;                        continue;  
+;                    }  
+;                    $inputHandle = fopen($file, 'rb');  
+;                    if (!$inputHandle) {  
+;                        continue;  
+;                    }  
+;                    //Read the file contents and write them to the output file.  ファイル内容を読み込んで出力ファイルに書き込む  
+;                    while(!feof($inputHandle)) {  
+;                        //64kbyte  
+;                        $buffer = fread($inputHandle, 65536);  
+;                        fwrite($outputHandle, $buffer);  
+;                    }  
+;                    fclose($inputHandle);  
+;                    //Erase the original. 元を消す  
+;                    unlink($file);  
+;                }  
+;                //Close the output file.  出力ファイルを閉じる  
+;                fclose($outputHandle);  
+;                //md5 check. md5チェック  
+;                $md5 = md5_file($dir.$zipname);  
+;                if($_zipmd5 === $md5){  
+;                } else {  
+;                    throw new \Exception($dir.$zipname."md5 error);  
+;                }  
+;            }  
+;        }  
+;    }  
+;?>  
+;  
+;<form action="./receive.php" method="POST" enctype="multipart/form-data">   
+;  <input type="file" name="file">   
+;  <input type="submit" value="phpuploader sample php">   
+;</form>   
 
 (Translation by Google)
