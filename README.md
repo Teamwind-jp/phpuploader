@@ -48,6 +48,8 @@ If you have any requests, please email us.
 This is a sample php. 以下サンプルphpです。  
 
 # PHP
+    //php start
+    
     //sample php for phpuploader. phpuploader用receivesample php
     //Split file reception and merging process. 分割ファイル受信結合処理
 
@@ -166,11 +168,12 @@ This is a sample php. 以下サンプルphpです。
         }
     }
 
+    //php end
 
-<form action="./receive.php" method="POST" enctype="multipart/form-data"> 
-  <input type="file" name="file"> 
-  <input type="submit" value="phpuploader sample php"> 
-</form> 
+    <form action="./receive.php" method="POST" enctype="multipart/form-data"> 
+      <input type="file" name="file"> 
+      <input type="submit" value="phpuploader sample php"> 
+    </form> 
 
 
 
