@@ -22,10 +22,14 @@ windowsサーバー間のデータバックアップツールです。
 # Requirement
 Nothing in particular. It will work on Windows.
 .Net Framework 4.8 is specified, so please change it as appropriate.
+For zipping, I use the SharpZipLib library on NuGet.
+For uploading, I use My.Computer.Network.UploadFile.
 PHP is required on the receiving side. However, the following PHP code is based on Windows.
 
 特にありません。windowsであれば動きます。  
 .net framework4.8を指定しているので適宜変更してください。  
+zipは、NuGetでSharpZipLibライブラリを使用しています。
+アップロードは、My.Computer.Network.UploadFileを使用しています。
 受信側は、php必須です。ただ下記phpはwindows前提コードです。  
 
 # License
@@ -36,7 +40,12 @@ MIT license。著作権は、Teamwindです。
 zipは、SharpZipLibライブラリ使用。
 
 # Note
-This is a sample php. サンプルphpです。  
+There may be bugs. Use at your own risk. Also, modify the code accordingly.
+バグがあるかもしれません。自己責任でご利用ください。また適宜コード変更してください。
+If you have any requests, please email us. 
+ご要望等がございましたらメール下さい。
+
+This is a sample php. 以下サンプルphpです。  
 
 ------------------------------------------
 
