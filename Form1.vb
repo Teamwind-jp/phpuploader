@@ -1,8 +1,7 @@
-﻿'   (c)Teamwind japan h.hayashi
+﻿'   (c)Teamwind japan n.h
 '
 '   サーバーメンテナンスツール Windows Server Maintenance Tools
 '
-'   Translation by Google
 
 Imports System.ComponentModel
 Imports System.Security.Policy
@@ -13,10 +12,10 @@ Public Class Form1
 
 #Region "my data"
 
-    '入力フォルダ
+    'zip folder 入力フォルダ
     Private txtpath() As TextBox
 
-    '監視フラグ
+    'Processing start flag 監視フラグ
     Dim fwatch As Boolean = False
 
     'copy指示
@@ -26,107 +25,73 @@ Public Class Form1
 
 #End Region
 
-#Region "delegates"
+#Region "delegates デリゲート共有"
 
-    '============================================================
-    '   go sign
-    '============================================================
-    Dim my_dlg_getGo As New pt_dlg_getGo(AddressOf _dlg_getGo)
-    Delegate Function pt_dlg_getGo() As Boolean
-    Public Function _dlg_getGo() As Boolean
-        Return fgo
-    End Function
+	'============================================================
+	'   go sign
+	'============================================================
+	Public Function _dlg_getGo() As Boolean
+		If Me.InvokeRequired Then
+			Return CType(Me.Invoke(New Func(Of Boolean)(AddressOf _dlg_getGo)), Boolean)
+		Else
+			Return fgo
+		End If
+	End Function
 
-    Dim my_dlg_setGo As New pt_dlg_setGo(AddressOf _dlg_setGo)
-    Delegate Sub pt_dlg_setGo(b As Boolean)
-    Public Sub _dlg_setGo(b As Boolean)
-        fgo = b
-    End Sub
+	Public Sub _dlg_setGo(value As Boolean)
+		If Me.InvokeRequired Then
+			Me.Invoke(New Action(Of Boolean)(AddressOf _dlg_setGo), value)
+		Else
+			fgo = value
+		End If
+	End Sub
 
+	'============================================================
+	'   Change start button str 開始ボタン変更
+	'============================================================
 
-    '============================================================
-    '   Batch Time バッチ時刻 
-    '   ComboBox1.SelectedIndex  
-    '============================================================
-    Dim my_dlg_ComboBox1_SelectedIndex As New pt_dlg_ComboBox1_SelectedIndex(AddressOf _dlg_ComboBox1_SelectedIndex)
-    Delegate Function pt_dlg_ComboBox1_SelectedIndex() As Integer
-    Public Function _dlg_ComboBox1_SelectedIndex() As Integer
-        Return ComboBox1.SelectedIndex
-    End Function
+	Public Sub _dlg_setButton1Text(value As String)
+		If Button1.InvokeRequired Then
+			Button1.Invoke(New Action(Of String)(AddressOf _dlg_setButton1Text), value)
+		Else
+			Button1.Text = value
+		End If
+	End Sub
 
-    '============================================================
-    '   Cut size カットサイズ
-    '   ComboBox2.SelectedIndex
-    '============================================================
-    Dim my_dlg_ComboBox2_SelectedIndex As New pt_dlg_ComboBox2_SelectedIndex(AddressOf _dlg_ComboBox2_SelectedIndex)
-    Delegate Function pt_dlg_ComboBox2_SelectedIndex() As Integer
-    Public Function _dlg_ComboBox2_SelectedIndex() As Integer
-        Return ComboBox2.SelectedIndex
-    End Function
-
-    '============================================================
-    '   password パスワード
-    '   txtPsw.Text
-    '============================================================
-    Dim my_dlg_txtPsw_Text As New pt_dlg_txtPsw_Text(AddressOf _dlg_txtPsw_Text)
-    Delegate Function pt_dlg_txtPsw_Text() As String
-    Public Function _dlg_txtPsw_Text() As String
-        Return txtPsw.Text
-    End Function
-
-    '============================================================
-    '   Timer
-    '============================================================
-    Dim my_dlg_Timer1_Enabled As New pt_dlg_Timer1_Enabled(AddressOf _dlg_Timer1_Enabled)
-    Delegate Sub pt_dlg_Timer1_Enabled(b As Boolean)
-    Public Sub _dlg_Timer1_Enabled(b As Boolean)
-        Timer1.Enabled = b
-    End Sub
-
-
-    '============================================================
-    '   Change start button str 開始ボタン変更
-    '============================================================
-    Dim my_dlg_Button1 As New pt_dlg_Button1(AddressOf _dlg_Button1)
-    Delegate Sub pt_dlg_Button1(str As String)
-    Public Sub _dlg_Button1(str As String)
-        Button1.Text = str
-    End Sub
-
-    '============================================================
-    '   Change message label メッセージラベル変更
-    '============================================================
-    Dim my_dlg_l4 As New pt_dlg_Button1(AddressOf _dlg_l4)
-    Delegate Sub pt_dlg_l4(str As String)
-    Public Sub _dlg_l4(str As String)
-        lblmsg.Text = str
-    End Sub
-
+	'============================================================
+	'   Change message label メッセージラベル変更
+	'============================================================
+	Public Sub _dlg_setLabelText(value As String)
+		If lblmsg.InvokeRequired Then
+			lblmsg.Invoke(New Action(Of String)(AddressOf _dlg_setLabelText), value)
+		Else
+			lblmsg.Text = value
+		End If
+	End Sub
 
 #End Region
 
-
 #Region "Main Thread メインスレッド "
 
-    'Main Thread メインスレッド 
-    Private Function threadUpload(ByVal worker As System.ComponentModel.BackgroundWorker, ByVal e As System.ComponentModel.DoWorkEventArgs) As Long
+	'Main Thread メインスレッド 
+	Private Function threadUpload(ByVal worker As System.ComponentModel.BackgroundWorker, ByVal e As System.ComponentModel.DoWorkEventArgs) As Long
 
         Do
 
             Thread.Sleep(10 * 1000)
 
-            'Is there a go command? go指示有るか　
-            Dim bgo As Boolean = Me.Invoke(my_dlg_getGo, New Object() {})
+			'Is there a go command? go指示有るか　
+			Dim bgo As Boolean = _dlg_getGo()
 
-            If bgo = False Then
+			If bgo = False Then
                 Continue Do
             End If
 
-            'msg out
-            Me.Invoke(my_dlg_Button1, New Object() {"処理中"})
+			'msg out
+			_dlg_setButton1Text("処理中")
 
-            'zip and cut Create a work folder. ワークフォルダ作成
-            Dim mywork = My.Application.Info.DirectoryPath + "\temp"
+			'zip and cut Create a work folder. ワークフォルダ作成
+			Dim mywork = My.Application.Info.DirectoryPath + "\temp"
             Try
                 Dim di As System.IO.DirectoryInfo = System.IO.Directory.CreateDirectory(mywork)
             Catch ex As Exception
@@ -161,10 +126,10 @@ Public Class Form1
                     z(zs) = zipname
                     zs += 1
 
-                    'zip start msg zip開始msg
-                    Me.Invoke(my_dlg_l4, New Object() {g_targetPath(i) + " zipping"})
-                    'Delete zip file from previous work 前回work内zip削除
-                    Try
+					'zip start msg zip開始msg
+					_dlg_setLabelText(g_targetPath(i) + " zipping")
+					'Delete zip file from previous work 前回work内zip削除
+					Try
                         Kill(mywork + "\" + zipname + ".zip")
                     Catch ex As Exception
                     End Try
@@ -207,10 +172,10 @@ Public Class Form1
                         Dim md5 = cmn_fileMD5(arrfiles.Item(j))
                         'Generate prm to pass to php. phpに渡すprm生成
                         Dim prm = zipname + ".zip." + j.ToString("000") + "," + j.ToString("000") + "," + (arrfiles.Count - 1).ToString + "," + md5 + "," + zipmd5
-                        'msg
-                        Me.Invoke(my_dlg_l4, New Object() {arrfiles.Item(j) + " sending"})
+						'msg
+						_dlg_setLabelText(arrfiles.Item(j) + " sending")
 
-                        Try
+						Try
                             My.Computer.Network.UploadFile(arrfiles.Item(j),
                             g_url + "?prm=" + prm,
                             "username", "password",
@@ -232,15 +197,16 @@ Public Class Form1
             'msg
             Dim dt As New MyDateTime
             dt.init()
-            Me.Invoke(my_dlg_l4, New Object() {dt.toFormatString + " done"})
+			_dlg_setLabelText(dt.toFormatString + " done")
 
-            'Erase go Wait for next timing. go消す 次のタイミング待ち状態にする
-            Me.Invoke(my_dlg_setGo, New Object() {False})
-            'Return the button. ボタンも戻す
-            Me.Invoke(my_dlg_Button1, New Object() {"開始"})
+			'Erase go Wait for next timing. go消す 次のタイミング待ち状態にする
+			_dlg_setGo(False)
+
+			'Return the button. ボタンも戻す
+			_dlg_setButton1Text("開始")
 
 
-        Loop
+		Loop
 
     End Function
 
@@ -435,8 +401,8 @@ Public Class Form1
 
         'Time Check. 時間チェック
         If cmn_datecmp(dt, dtbk) < 0 Then
-            Button1.Text = "next day/hour" + dtbk.day.ToString + "/" + dtbk.hour.ToString + ""
-            Return
+			Button1.Text = "next " + dtbk.day.ToString + "　" + dtbk.hour.ToString("00") + ":00"
+			Return
         End If
 
         'Start here. ここまできたら開始

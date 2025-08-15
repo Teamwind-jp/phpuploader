@@ -1,51 +1,68 @@
 # phpuploader
-This is a data backup tool between Windows servers.
-I use it to exchange data between my personal main/backup servers.
-The functions of this exe are:
-1. Zip the specified folder.
-2. Cut into multiple files of a size that does not put a load on the server.
-3. Sequentially send to other servers.
-4. Execute the above daily or immediately.
-That's all.
-The receiving PHP code is below.
-
 windowsサーバー間のデータバックアップツールです。  
+所謂バックエンドソフトです。  
 個人で運用している本/予備サーバー同士のデータ交換に使用しています。  
+受信する側は、phpを使用しています。
 本exeの機能は、  
 1.指定フォルダをzip。  
 2.負荷のかからないサイズの複数ファイルにカット。  
 3.順次他サーバーへ送信しています。  
-4.以上を日次または即時実行。  
+4.以上を日次バッチまたは即時実行。  
 の以上です。  
-下記に受信側phpコードを載せます。  
-
+下記に受信側phpコードを載せてます。  
+  
+c#版も公開しています。  
+  
 # Requirement
-Nothing in particular. It will work on Windows.
-.Net Framework 4.8 is specified, so please change it as appropriate.
-For zipping, I use the SharpZipLib library on NuGet.
-For uploading, I use My.Computer.Network.UploadFile.
-PHP is required on the receiving side. However, the following PHP code is based on Windows.
-
 特にありません。windowsであれば動きます。  
 .net framework4.8を指定しているので適宜変更してください。  
-zipは、NuGetでSharpZipLibライブラリを使用しています。
+VS2022でビルドしています。
+zipは、NuGetからSharpZipLibライブラリを使用しています。
 アップロードは、My.Computer.Network.UploadFileを使用しています。
-受信側は、php必須です。ただ下記phpはwindows前提コードです。  
+受信側は、php必須です。ただ下記phpはパスの設定などwindows前提のコードです。  
+  
+# Usage
+![phpuploader](http://teamwind.serveblog.net/github/phpuploader/001.jpg)
+
+1.データを受信するphpのURLを指定します。  
+　サーバー側でポート制限したりURLやphpファイル名を複雑にするなどしてセキュリティを確保してください。
+2.バックアップするフォルダをD&Dします。5つまで指定可能。  
+3.転送するサイズを指定します。  
+　サーバーに負荷のかからないサイズを指定してください。また、webサーバーのアップロードサイズ制限と確認してください。  
+4.zipに付けるパスワードを指定します。  
+　万一の漏洩に備えて頑丈なパスワードを指定してください。  
+5.開始時刻を指定します。  
+　日次バッチ開始時刻を指定します。[now]は、一回限りです。バッチ時刻指定しても即時実行されます。
+
+# How It Works
+1.timerでバッチ時刻監視しています。zipしてphpに送信する処理は、処理を独占するのでbackground workerで実行しています。  
+2.background workerは、無限ループしています。timer内、バッチ時刻到達で立てたフラグを確認して処理を実行しています。  
+3.フラグは、グローバルで保持していますがbackground workerからもアクセスしているので注意が必要かもしれません。（実稼働では問題は出ていません）
+
+# Tecnical Details
+主なコードは、以下の通りです。  
+1.バックグラウンドワーカーを使用。  
+2.デリゲート。  
+3.SharpZipLib操作。  
+4.ドラッグドロップ。  
+5.ログファイルの読み書き。  
+6.md5取得。  
+7.ファイル分割。  
+8.php連動。My.Computer.Network.UploadFile使用。  
+9.phpで結合処理。
 
 # License
 MIT license. Copyright: Teamwind.
 zip uses the SharpZipLib library.
 
 MIT license。著作権は、Teamwindです。  
-zipは、SharpZipLibライブラリ使用。
+zipは、SharpZipLibライブラリ使用。  
 
 # Note
-There may be bugs. Use at your own risk. Also, modify the code accordingly.
-バグがあるかもしれません。自己責任でご利用ください。また適宜コード変更してください。
-If you have any requests, please email us. 
-ご要望等がございましたらメール下さい。
+バグがあるかもしれません。自己責任でご利用ください。また適宜コード変更してください。  
+ご要望等がございましたらメール下さい。  
 
-This is a sample php. 以下サンプルphpです。  
+以下サンプルphpです。  
 
 # PHP
     //php start
@@ -53,18 +70,11 @@ This is a sample php. 以下サンプルphpです。
     //sample php for phpuploader. phpuploader用receivesample php
     //Split file reception and merging process. 分割ファイル受信結合処理
 
-    //this store them by day of the week, meaning keep a 7-day supply.
     //曜日ごとに保管しています。つまり7日分保持しています。
-
-    //Please change each setting as appropriate.
     //各設定は、適宜変更してください。
-
     //MIT license (c)teamwind n.h
 
-    //(Translation by Google)
-
-    //Storage directory. 保管dir
-    //for windows
+    //Storage directory. 保管dir for windows
     $storagedir = "c:\\backup\\";
 
     //?
@@ -73,7 +83,7 @@ This is a sample php. 以下サンプルphpです。
         exit;
     }
 
-    //Sub-dir name of storage dir. 保管dirの下位dir名
+    //保管dirの下位dir名　曜日ごとのサブdir名
     $week = array('sun','mon','tue','wed','thu','fri','sat');
 
     $date = date('w');
@@ -81,8 +91,9 @@ This is a sample php. 以下サンプルphpです。
     //prm analysis. prm解析
     $prms = explode(',', mb_convert_encoding($_GET["prm"], "SJIS", "UTF-8"));
 
-    //prm=zip File name+Division Number(000-nnn),Division Number(000-nnn),Final division number,this md5,zip md5
-    //prm=zipファイル名+分割番号,分割番号,最終分割番号,当該md5,結合したzipのmd5
+	//パラメタ解析
+    //prm=zipファイル名+分割番号,当該分割番号,全体の最終分割番号,当該md5,結合したzipのmd5
+	//サンプル
     //abc.zip.000,2,xxxxxxxxxxxxxxxxxxxx(md5),xxxxxxxxxxxxxxxxxxxx(md5)
     //abc.zip.001,2,xxxxxxxxxxxxxxxxxxxx(md5),xxxxxxxxxxxxxxxxxxxx(md5)
     //abc.zip.002,2,xxxxxxxxxxxxxxxxxxxx(md5),xxxxxxxxxxxxxxxxxxxx(md5)
@@ -98,7 +109,7 @@ This is a sample php. 以下サンプルphpです。
     }else{
         mkdir($dir, 0777, true);
     }
-    //move file. 移動
+    //move file. 受信したファイルを保管先へ移動
     move_uploaded_file($_FILES["file"]["tmp_name"], $dir.$_sepname);
 
     //md5 check. md5チェック
@@ -111,10 +122,10 @@ This is a sample php. 以下サンプルphpです。
     //If it is the last file, start joining. もし最終ファイルなら結合開始
     if($_no == $_lastno){
 
-        //Zip file name without [.nnn]. zip file名は[.nnn]を除いたもの   abc.zip.000
+        //Zip file name without [.nnn]. zip file名は[.nnn]を除いたもの   abc.zip.000　なので後ろ4文字削除
         $zipname = substr($_sepname, 0, strlen($_sepname)-4);
 
-        //Generate a file list. ファイルリストを生成する
+        //Generate a file list. 結合するファイルリストを生成する
         //abc.zip.000
         //abc.zip.001
         //abc.zip.002
