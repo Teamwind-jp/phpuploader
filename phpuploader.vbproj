@@ -146,6 +146,7 @@
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="README.md" />
+    <None Include="receive.php" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="favicon.ico" />
