@@ -1,68 +1,70 @@
-# phpuploader
-windowsサーバー間のデータバックアップツールです。  
-所謂バックエンドソフトです。  
-個人で運用している本/予備サーバー同士のデータ交換に使用しています。  
-受信する側は、phpを使用しています。
-本exeの機能は、  
+# phpuploaderCS
+
+![phpuploader](http://teamwind.serveblog.net/github/phpuploader/phpuploader.jpg)
+
+本プロジェクトは、Visual Basic .netによるサーバーサイドの保守ツールです。  
+指定フォルダをzip(password付)し指定サイズで分割後、他サーバーへアップロード(php)しバックアップしています。  
+  
+処理内容は、  
 1.指定フォルダをzip。  
 2.負荷のかからないサイズの複数ファイルにカット。  
-3.順次他サーバーへ送信しています。  
-4.以上を日次バッチまたは即時実行。  
-の以上です。  
-下記に受信側phpコードを載せてます。  
+3.順次phpサーバーへアップロードしています。  
+4.phpサーバー側で結合し保管。phpも添付しています。(receive.php)  
+5.以上を日次または即時実行。  
+以上です。  
   
-c#版も公開しています。  
+※※補足※※  
+同じ処理を別の言語で作成した下記プロジェクトも公開中です。よろしければこちらのリポリトジもご覧ください。  
+phpuploaderCS c#版  
+phpuploaderNJS Node.js版  
   
 # Requirement
-特にありません。windowsであれば動きます。  
+  
+Windows11上で書いています。  
+nvmにてnodejsをインストール。現時点では下記バージョンです。  
+Visual Studio 2022を使用しています。Version 17.14.13 (August 2025)  
 .net framework4.8を指定しているので適宜変更してください。  
-VS2022でビルドしています。  
-zipは、NuGetからSharpZipLibライブラリを使用しています。  
-アップロードは、My.Computer.Network.UploadFileを使用しています。  
-受信側は、php必須です。ただ下記phpはパスの設定などwindows前提のコードです。   
+zipは、NuGetでSharpZipLibライブラリを使用しています。  
+アップロードは、Microsoft.VisualBasic.Devices.Network()を使用しています。[参照にMicrosoft.VisualBasic.dllを追加しています。]  
+  
+本プロジェクトを実行するためのphpサーバーを別途用意してください。  
   
 # Usage
-![phpuploader](http://teamwind.serveblog.net/github/phpuploader/001.jpg)
-
-1.データを受信するphpのURLを指定します。  
-　サーバー側でポート制限したりURLやphpファイル名を複雑にするなどしてセキュリティを確保してください。  
-2.バックアップするフォルダをD&Dします。5つまで指定可能。  
-3.転送するサイズを指定します。  
-　サーバーに負荷のかからないサイズを指定してください。また、webサーバーのアップロードサイズ制限と確認してください。  
-4.zipに付けるパスワードを指定します。  
-　万一の漏洩に備えて頑丈なパスワードを指定してください。  
-5.開始時刻を指定します。  
-　日次バッチ開始時刻を指定します。[now]は、一回限りです。バッチ時刻指定しても即時実行されます。  
-
+  
+1.起動後、上図サンプル画面を参考に入力欄を設定してください。startボタンで開始します。  
+2.分割サイズは、php.iniの「post_max_size = 」側と合わせて調整してください。  
+3.もし公開サーバーで検証する場合は、phpのファイル名を複雑怪奇にしたり認証処理も追加するなどセキュリティを強化した方がよいと思います。  
+  
 # How It Works
-1.timerでバッチ時刻監視しています。zipしてphpに送信する処理は、処理を独占するのでbackground workerで実行しています。  
-2.background workerは、無限ループしています。timer内、バッチ時刻到達で立てたフラグを確認して処理を実行しています。  
-3.フラグは、グローバルで保持していますがbackground workerからもアクセスしているので注意が必要かもしれません。（実稼働では問題は出ていません）
+  
+  1.メイン処理は、backgroundWorker内に書いています。  
+  2.メイン処理は、永久ループしています。外部からのトリガーによって処理を開始しています。  
+  3.トリガーは、即時実行と日次実行があります。timer内でトリガーフラグを制御しています。    
+  4.日次の場合は、設定した次回実行日時とシステム日を比較判定しています。
+  5.phpは、受信したファイルのmd5値をprmと比較、最終ファイルなら結合をしています。  
 
 # Tecnical Details
-主なコードは、以下の通りです。  
-1.バックグラウンドワーカーを使用。  
-2.デリゲート。  
-3.SharpZipLib操作。  
-4.ドラッグドロップ。  
-5.ログファイルの読み書き。  
-6.md5取得。  
-7.ファイル分割。  
-8.php連動。My.Computer.Network.UploadFile使用。  
-9.phpで結合処理。
-
-# License
-MIT license. Copyright: Teamwind.
-zip uses the SharpZipLib library.
-
-MIT license。著作権は、Teamwindです。  
-zipは、SharpZipLibライブラリ使用。  
-
+  
+1.SharpZipLibでzip。  
+2.ファイルをFileStreamでカット。  
+3.md5取得。  
+4.My.Computer.Network.UploadFileでupload。  
+5.非同期処理。  
+6.デリゲートでUI更新。  
+7.php連携。  
+  
 # Note
+  
+実際に運用する場合は、もう少しセキュリティとエラー対策を強化する必要があります。サーバー負荷軽減の調整も必要です。  
+コードはすべてwindows前提です。他OSはパス等適宜変更してください。  
 バグがあるかもしれません。自己責任でご利用ください。また適宜コード変更してください。  
 ご要望等がございましたらメール下さい。  
+  
+# License
+  
+MIT license。オリジナルコードの著作権は、Teamwindです。それ以外のライブラリ等の著作権は各々の所有者に帰属します。  
 
-以下サンプルphpです。  
+This is a sample php. 以下サンプルphpです。  
 
 # PHP
     //php start
@@ -70,11 +72,18 @@ zipは、SharpZipLibライブラリ使用。
     //sample php for phpuploader. phpuploader用receivesample php
     //Split file reception and merging process. 分割ファイル受信結合処理
 
+    //this store them by day of the week, meaning keep a 7-day supply.
     //曜日ごとに保管しています。つまり7日分保持しています。
+
+    //Please change each setting as appropriate.
     //各設定は、適宜変更してください。
+
     //MIT license (c)teamwind n.h
 
-    //Storage directory. 保管dir for windows
+    //(Translation by Google)
+
+    //Storage directory. 保管dir
+    //for windows
     $storagedir = "c:\\backup\\";
 
     //?
@@ -83,7 +92,7 @@ zipは、SharpZipLibライブラリ使用。
         exit;
     }
 
-    //保管dirの下位dir名　曜日ごとのサブdir名
+    //Sub-dir name of storage dir. 保管dirの下位dir名
     $week = array('sun','mon','tue','wed','thu','fri','sat');
 
     $date = date('w');
@@ -91,9 +100,8 @@ zipは、SharpZipLibライブラリ使用。
     //prm analysis. prm解析
     $prms = explode(',', mb_convert_encoding($_GET["prm"], "SJIS", "UTF-8"));
 
-	//パラメタ解析
-    //prm=zipファイル名+分割番号,当該分割番号,全体の最終分割番号,当該md5,結合したzipのmd5
-	//サンプル
+    //prm=zip File name+Division Number(000-nnn),Division Number(000-nnn),Final division number,this md5,zip md5
+    //prm=zipファイル名+分割番号,分割番号,最終分割番号,当該md5,結合したzipのmd5
     //abc.zip.000,2,xxxxxxxxxxxxxxxxxxxx(md5),xxxxxxxxxxxxxxxxxxxx(md5)
     //abc.zip.001,2,xxxxxxxxxxxxxxxxxxxx(md5),xxxxxxxxxxxxxxxxxxxx(md5)
     //abc.zip.002,2,xxxxxxxxxxxxxxxxxxxx(md5),xxxxxxxxxxxxxxxxxxxx(md5)
@@ -109,7 +117,7 @@ zipは、SharpZipLibライブラリ使用。
     }else{
         mkdir($dir, 0777, true);
     }
-    //move file. 受信したファイルを保管先へ移動
+    //move file. 移動
     move_uploaded_file($_FILES["file"]["tmp_name"], $dir.$_sepname);
 
     //md5 check. md5チェック
@@ -122,10 +130,10 @@ zipは、SharpZipLibライブラリ使用。
     //If it is the last file, start joining. もし最終ファイルなら結合開始
     if($_no == $_lastno){
 
-        //Zip file name without [.nnn]. zip file名は[.nnn]を除いたもの   abc.zip.000　なので後ろ4文字削除
+        //Zip file name without [.nnn]. zip file名は[.nnn]を除いたもの   abc.zip.000
         $zipname = substr($_sepname, 0, strlen($_sepname)-4);
 
-        //Generate a file list. 結合するファイルリストを生成する
+        //Generate a file list. ファイルリストを生成する
         //abc.zip.000
         //abc.zip.001
         //abc.zip.002
@@ -186,6 +194,3 @@ zipは、SharpZipLibライブラリ使用。
       <input type="submit" value="phpuploader sample php"> 
     </form> 
 
-
-
-(Translation by Google)
